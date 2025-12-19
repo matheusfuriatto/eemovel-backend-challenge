@@ -36,11 +36,10 @@
       }).addTo(map);
 
      function getJson(data) {
-    console.log("Dados recebidos do GeoServer:", data); // Isso ajuda a ver os nomes das colunas no F12
+    console.log("Dados recebidos do GeoServer:", data);
     
     L.geoJSON(data, {
         pointToLayer: function (feature, latlng) {
-            // Se os pontos aparecerem na África (0,0), inverta latlng abaixo
             return L.circleMarker(latlng, {
                 radius: 10,
                 fillColor: "#ff0000",
@@ -51,7 +50,6 @@
             });
         },
         onEachFeature: function (feature, layer) {
-            // O GeoServer pode retornar 'nome' ou 'name'
             var props = feature.properties;
             var nome = props.nome || props.name || props.NOME || "Item";
             var desc = props.descricao || props.description || props.DESCRICAO || "";

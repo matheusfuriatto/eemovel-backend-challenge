@@ -33,8 +33,6 @@ class Login(Resource):
         user = User.query.filter_by(email=data['email']).first()
         
         if user and user.check_password(data['password']):
-            # CORREÇÃO AQUI: Convertendo explicitamente o ID para string
-            # Isso evita o erro 422 "Subject must be a string"
             token = create_access_token(identity=str(user.id))
             
             return {"access_token": token}, 200

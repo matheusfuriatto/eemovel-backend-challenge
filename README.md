@@ -18,6 +18,13 @@ A aplicação foi estruturada utilizando o padrão Application Factory do Flask,
 
 ### Configuração de Ambiente
 
+O projeto depende de variáveis de ambiente para gerenciar conexões e chaves de segurança.
+
+```bash
+cp .env.example .env
+
+```
+
 ### Deploy do Ambiente
 
 A orquestração via Docker Compose automatiza a subida do banco de dados, da API e do servidor de mapas.

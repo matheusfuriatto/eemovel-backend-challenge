@@ -7,7 +7,6 @@ def calculate_distance(p1, p2):
 def optimize_route(start_point, destinations):
     """
     Algoritmo Vizinho Mais Próximo (Nearest Neighbor).
-    Não garante a solução perfeita, mas é muito rápido e eficiente para rotas de entrega.
     """
     route = [start_point]
     current = start_point

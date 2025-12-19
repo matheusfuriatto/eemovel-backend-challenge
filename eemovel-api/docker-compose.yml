@@ -23,11 +23,11 @@ services:
     environment:
       - DATABASE_URL=postgresql://admin:admin_password@db:5432/geodb
       - JWT_SECRET_KEY=super-secret-key
-      - PYTHONPATH=/app  # <--- ISSO DIZ AO PYTHON ONDE ESTÁ A PASTA UTILS
+      - PYTHONPATH=/app
     depends_on:
       db:
         condition: service_healthy
-    command: python manage.py # <--- GARANTE QUE ELE CHAME O GERENCIADOR DA RAIZ
+    command: python manage.py
 
   geoserver:
     image: kartoza/geoserver:latest

@@ -4,13 +4,11 @@ from flask_jwt_extended import jwt_required
 from app.models.item import Item
 from app.extensions import db
 from geoalchemy2 import Geography
-from geoalchemy2.shape import to_shape # Para converter binário em objeto calculável
+from geoalchemy2.shape import to_shape
 from sqlalchemy import cast
 
-# 1. DEFINIÇÃO DO NAMESPACE (Deve vir antes de qualquer rota)
 item_ns = Namespace('items', description='Operações Geoespaciais e Logística')
 
-# 2. MODELO PARA O SWAGGER
 item_model = item_ns.model('Item', {
     'nome': fields.String(required=True, example='Ponto A'),
     'descricao': fields.String(example='Descrição do Ponto'),
