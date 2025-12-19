@@ -1,95 +1,72 @@
-# 🌍 Sistema de Logística Inteligente - Eemovel
 
-Esta aplicação é uma plataforma de inteligência geográfica voltada para logística. Ela permite o cadastro de pontos de interesse, visualização em mapa interativo e a geração de rotas otimizadas baseadas em proximidade geográfica e capacidade de carga.
+# E-emovel: API de Logística e Processamento Geoespacial
 
-## 🛠️ Tecnologias e Requisitos Técnicos
+Este projeto consiste em uma API RESTful especializada em operações logísticas, integrando processamento de dados geográficos, otimização de rotas e visualização de mapas. A solução utiliza uma arquitetura conteinerizada para garantir a consistência entre os ambientes de desenvolvimento e produção.
 
-Para atender aos requisitos do desafio, foram utilizadas:
+## Stack Tecnológica e Decisões de Arquitetura
 
-* **Backend:** Flask com Flask-RESTx (Swagger).
-* **Segurança:** Autenticação JWT e criptografia de senhas com **Bcrypt**.
-* **Banco de Dados:** PostgreSQL 15 com extensão **PostGIS** para dados espaciais.
-* **Servidor de Mapas:** GeoServer para renderização de camadas geográficas.
-* **Arquitetura:** Injeção de configurações via variáveis de ambiente e arquivo `.env`.
+A aplicação foi estruturada utilizando o padrão Application Factory do Flask, facilitando a escalabilidade e a implementação de testes de integração.
 
----
+* **Backend:** Python 3.10 com Flask e Flask-RESTx (Swagger/OpenAPI).
+* **Banco de Dados:** PostgreSQL 15 com extensão PostGIS para persistência de objetos geográficos.
+* **Camada de Dados:** SQLAlchemy com GeoAlchemy2 para manipulação de tipos `Geography` e execução de queries espaciais nativas.
+* **Segurança:** Autenticação stateless via JWT (Flask-JWT-Extended) e hashing de credenciais com Bcrypt.
+* **GIS Server:** GeoServer para a publicação de camadas via protocolos OGC (WMS/WFS).
+* **Infraestrutura:** Docker e Docker Compose para orquestração de serviços.
 
-## 🚀 Como Executar o Projeto
+## Procedimentos de Inicialização
 
-O projeto é totalmente conteinerizado. Siga os passos abaixo:
+### Configuração de Ambiente
 
-1. **Clone o repositório:**
+O projeto depende de variáveis de ambiente para gerenciar conexões e chaves de segurança.
+
 ```bash
-git clone <url-do-repositorio>
-cd eemovel-api
+cp .env.example .env
 
 ```
 
+### Deploy do Ambiente
 
-2. **Suba o ambiente com Docker:**
+A orquestração via Docker Compose automatiza a subida do banco de dados, da API e do servidor de mapas.
+
 ```bash
 docker-compose up --build
 
 ```
 
+### Provisionamento Automático
 
-3. **Aguarde a Automação:**
-O container `eemovel-geoserver-setup` irá configurar automaticamente o GeoServer e popular o banco com **10 pontos turísticos de São Paulo**. Quando o log exibir `✅ Automação concluída!`, o sistema estará pronto.
+O serviço `geoserver-setup` atua como um script de bootstrap que realiza as seguintes operações assim que os serviços atingem o estado de *healthy*:
 
----
+1. Criação de Workspace e Datastore no GeoServer apontando para o PostGIS.
+2. Publicação da camada de itens baseada em SQL Views.
+3. Carga inicial de dados: o sistema é populado automaticamente com 10 coordenadas estratégicas de Cascavel, PR, para validação imediata da lógica de roteamento.
 
-## 🧪 Como Executar os Testes
+## Endpoints e Visualização
 
-A aplicação possui uma suíte de testes robusta que valida a segurança (Bcrypt/JWT) e a lógica de otimização logística. Para rodar os testes dentro do container:
+* **API Documentation:** Disponível na raiz do serviço (`http://localhost:5000/`), provendo interface Swagger para testes de contrato.
+* **GIS Viewer:** Um cliente Leaflet está disponível em `http://localhost:5000/static/mapa.html`, consumindo dados via WFS diretamente do GeoServer.
 
-```bash
-docker-compose exec web sh -c "PYTHONPATH=. pytest -s tests/"
+### Autenticação para Testes
 
-```
-
-**O que os testes validam?**
-
-* **Bcrypt:** Se a senha é criptografada corretamente no banco.
-* **JWT:** Se as rotas protegidas bloqueiam usuários não autenticados.
-* **Logística:** Se o algoritmo de "Vizinho Mais Próximo" agrupa corretamente pontos próximos (Ex: Catedral da Sé e Pátio do Colégio na mesma viagem).
-
----
-
-## 📍 Acessando o Sistema
-
-### 1. Documentação da API (Swagger)
-
-Interface interativa para testar todos os endpoints:
-👉 **URL:** http://localhost:5000/
-
-### 2. Mapa Interativo
-
-Visualização dos pontos de São Paulo cadastrados:
-👉 **URL:** [http://localhost:5000/static/mapa.html](http://localhost:5000/static/mapa.html)
-
-### 3. Credenciais de Teste (Padrão)
-
-Para testar os endpoints protegidos no Swagger:
+Para operações de escrita e otimização, utilize as credenciais pré-carregadas:
 
 * **Usuário:** `teste@eemovel.com`
 * **Senha:** `123`
 
----
+## Lógica de Otimização de Roteiro
 
-## 💡 Lógica de Otimização (Diferencial)
+O endpoint `/items/optimize` implementa uma solução para o Problema de Roteamento de Veículos (VRP) utilizando a heurística do vizinho mais próximo (*Nearest Neighbor*).
 
-O endpoint `/items/optimize` implementa um algoritmo de **Clusterização Geográfica**. Ao definir uma `capacity`, o sistema busca o ponto mais próximo de cada origem, otimizando o deslocamento.
+O algoritmo processa a matriz de distâncias geográficas para agrupar pontos de entrega conforme a capacidade nominal do veículo informada no parâmetro `capacity`. O critério de agrupamento prioriza a minimização da distância euclidiana entre os pontos de uma mesma viagem, reduzindo o custo operacional de deslocamento.
 
-Exemplo prático com os dados inclusos:
+## Validação e Qualidade de Código (Testes)
 
-* **Viagem 1:** Agrupa pontos do Centro (Sé, Pátio do Colégio).
-* **Viagem 2:** Agrupa pontos da Zona Oeste (Beco do Batman, Instituto Butantan).
+A suíte de testes de integração valida o fluxo completo, desde a autenticação até o cálculo de proximidade geográfica no banco de dados. Os testes são executados contra o banco de dados real para garantir a compatibilidade com as funções espaciais do PostGIS.
 
----
+Para executar os testes de integração e validar o agrupamento de pontos em Cascavel:
 
-## 📂 Estrutura de Configuração
+```bash
+docker-compose exec web pytest /app/tests/test_api.py -s
 
-O projeto utiliza um arquivo `.env` para gerenciar senhas e URLs de conexão. O arquivo `utils/config.py` centraliza essas informações, seguindo as melhores práticas de arquitetura Flask (Application Factory).
-
----
-
+```
