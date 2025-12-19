@@ -60,12 +60,12 @@ docker-compose exec web sh -c "PYTHONPATH=. pytest -s tests/"
 ### 1. Documentação da API (Swagger)
 
 Interface interativa para testar todos os endpoints:
-👉 **URL:** [http://localhost:5000/doc]
+👉 **URL:** http://localhost:5000/
 
 ### 2. Mapa Interativo
 
 Visualização dos pontos de São Paulo cadastrados:
-👉 **URL:** [http://localhost:5000/static/mapa.html]
+👉 **URL:** [http://localhost:5000/static/mapa.html](http://localhost:5000/static/mapa.html)
 
 ### 3. Credenciais de Teste (Padrão)
 
