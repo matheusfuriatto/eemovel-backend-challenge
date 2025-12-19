@@ -8,5 +8,7 @@ psycopg2-binary
 geoalchemy2
 shapely
 python-dotenv
+
+# Testes
 pytest
 pytest-flask
