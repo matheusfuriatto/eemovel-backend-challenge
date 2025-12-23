@@ -1,10 +1,4 @@
-Aqui tens o conteúdo completo e formatado do teu arquivo `README.md`, já atualizado com todas as funcionalidades do `item_ns`, a documentação do Swagger e os diferenciais técnicos que implementaste.
 
-Podes copiar e colar o conteúdo abaixo diretamente no teu arquivo:
-
----
-
-```markdown
 # E-emovel: API de Logística e Processamento Geoespacial
 
 Este projeto consiste em uma API RESTful especializada em operações logísticas, integrando processamento de dados geográficos, otimização de rotas e visualização de mapas. A solução utiliza uma arquitetura conteinerizada para garantir a consistência entre os ambientes de desenvolvimento e produção.
