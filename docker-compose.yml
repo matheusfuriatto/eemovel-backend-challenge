@@ -1,0 +1,60 @@
+
+services:
+  db:
+    image: postgis/postgis:15-3.3
+    container_name: eemovel-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin_password
+      POSTGRES_DB: geodb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d geodb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    container_name: eemovel-app
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://admin:admin_password@db:5432/geodb
+      - JWT_SECRET_KEY=super-secret-key
+      - PYTHONPATH=/app
+    depends_on:
+      db:
+        condition: service_healthy
+    command: python manage.py
+
+  geoserver:
+    image: kartoza/geoserver:latest
+    container_name: eemovel-geoserver
+    ports:
+      - "8080:8080"
+    environment:
+      - GEOSERVER_ADMIN_PASSWORD=geoserver
+      - GEOSERVER_ADMIN_USER=admin
+      - ALLOW_ENV_PARAM_INTERPOLATION=true
+    depends_on:
+      db:
+        condition: service_healthy
+
+  geoserver-setup:
+    image: curlimages/curl:latest
+    container_name: eemovel-geoserver-setup
+    volumes:
+      - ./setup_geoserver.sh:/setup_geoserver.sh
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      "echo 'Aguardando GeoServer e Web...' &&
+       until curl -s http://geoserver:8080/geoserver/rest/about/version.xml -u admin:geoserver && curl -s http://web:5000/items/ > /dev/null; do
+         sleep 5;
+       done;
+       echo 'Serviços prontos! Rodando configuração...' &&
+       sh /setup_geoserver.sh"
+    depends_on:
+      - geoserver
+      - web
