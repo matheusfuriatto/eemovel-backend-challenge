@@ -35,14 +35,8 @@ A aplicação foi estruturada utilizando o padrão Application Factory do Flask,
 
 ## Procedimentos de Inicialização
 
-### 1. Configuração de Ambiente
-Crie o arquivo de variáveis de ambiente:
-```bash
-cp .env.example .env
 
-```
-
-### 2. Deploy do Ambiente via Docker
+### 1. Deploy do Ambiente via Docker
 
 A orquestração automatiza a subida do banco de dados (com PostGIS), da API e do GeoServer:
 
@@ -51,7 +45,7 @@ docker-compose up --build
 
 ```
 
-### 3. Provisionamento Automático (GeoServer)
+### 2. Provisionamento Automático (GeoServer)
 
 O serviço `geoserver-setup` realiza o bootstrap automático assim que os serviços estão prontos:
 
